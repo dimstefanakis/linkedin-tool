@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Flex, Box, Text } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { Avatar } from "@chakra-ui/avatar";
 import { ProfileInterface } from "../Profile/interface";
+import { ProfileContext } from "../../context/ProfileContext";
 
 interface ProfileCardProps {
   profile: ProfileInterface;
@@ -11,30 +12,26 @@ interface ProfileCardProps {
 }
 
 function ProfileCard({ profile, profiles, setProfiles }: ProfileCardProps) {
+  const profileContext = useContext(ProfileContext);
   const [approveLoading, setApproveLoading] = useState<boolean>(false);
   const [denyLoading, setDenyLoading] = useState<boolean>(false);
 
-  function handleMarkProfileInSheet(profile: ProfileInterface) {
+  async function handleMarkProfileInSheet(profile: ProfileInterface) {
     let url = `https://api.sheety.co/6db0166e73d47e215afcb6675c9f83d9/test/sheet/${profile.id}`;
     let body = {
       sheet: profile,
     };
-    fetch(url, {
+    let response = await fetch(url, {
       method: "PUT",
       headers: new Headers({ "content-type": "application/json" }),
       body: JSON.stringify(body),
     })
-      .then((response) => response.json())
-      .then((json) => {
-        // Do something with object
-        // reset loading states
-        setApproveLoading(false);
-        setDenyLoading(false);
-        console.log(json.sheet);
-      });
+    let data = await response.json();
+    setApproveLoading(false);
+    setDenyLoading(false);
   }
 
-  function handleMark(id: number, approved: boolean) {
+  async function handleMark(id: number, approved: boolean) {
     let updatedProfiles = profiles.map((profile) => {
       if (profile.id === id) {
         profile.approved = approved;
@@ -49,11 +46,16 @@ function ProfileCard({ profile, profiles, setProfiles }: ProfileCardProps) {
     }
     // update in sheet
     let updatedProfile = profiles.find((oldProfile) => oldProfile.id == id);
+    let updatedProfileIndex = profiles.findIndex(
+      (oldProfile) => oldProfile.id == id
+    );
+
     if (updatedProfile) {
-      handleMarkProfileInSheet(updatedProfile);
+      await handleMarkProfileInSheet(updatedProfile);
     }
     // update in state
     setProfiles(updatedProfiles);
+    profileContext.setIndex(Math.min(updatedProfileIndex + 1, profiles.length));
   }
 
   return (
