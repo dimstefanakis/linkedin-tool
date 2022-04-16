@@ -1,7 +1,12 @@
 import { useState, useContext } from "react";
-import { Flex, Box, Text } from "@chakra-ui/layout";
+import { Flex, Box, Text, Link } from "@chakra-ui/layout";
 import { Button } from "@chakra-ui/button";
 import { Avatar } from "@chakra-ui/avatar";
+import {
+  AiFillLinkedin,
+  AiFillMail,
+  AiFillExclamationCircle,
+} from "react-icons/ai";
 import { ProfileInterface } from "../Profile/interface";
 import { ProfileContext } from "../../context/ProfileContext";
 
@@ -25,7 +30,7 @@ function ProfileCard({ profile, profiles, setProfiles }: ProfileCardProps) {
       method: "PUT",
       headers: new Headers({ "content-type": "application/json" }),
       body: JSON.stringify(body),
-    })
+    });
     let data = await response.json();
     setApproveLoading(false);
     setDenyLoading(false);
@@ -90,11 +95,36 @@ function ProfileCard({ profile, profiles, setProfiles }: ProfileCardProps) {
             {profile.firstName} {profile.lastName}
           </Text>
         </Box>
-        <Box mt={4}>
+        <Box mt={1}>
           <Text color="gray.500">
             {profile.title} @ {profile.company}
           </Text>
         </Box>
+        <Flex w="100%" mt={16} flexFlow="column">
+          {profile.profile && (
+            <Link
+              href={profile.profile}
+              target="_blank"
+              display="flex"
+              alignItems="center"
+            >
+              <AiFillLinkedin size="1.4em" />
+              <Text ml={2}>{profile.profile}</Text>
+            </Link>
+          )}
+          {profile.email && (
+            <Flex alignItems="center" mt={2}>
+              <AiFillMail size="1.4em" />
+              <Text ml={2}>{profile.email}</Text>
+            </Flex>
+          )}
+          {profile.note && (
+            <Flex mt={2}>
+              <AiFillExclamationCircle size="1.4em" />
+              <Text ml={2}>{profile.note}</Text>
+            </Flex>
+          )}
+        </Flex>
         <Flex mt={16} w="100%" justifyContent="space-evenly">
           <Button
             isLoading={approveLoading}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -6,10 +6,13 @@ import { Flex } from "@chakra-ui/layout";
 import ProfileCard from "../src/flat/ProfileCard";
 import { ProfileInterface } from "../src/flat/Profile/interface";
 import Carousel from "../src/features/Carousel";
+import { ProfileContext } from "../src/context/ProfileContext";
 import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
   const [profiles, setProfiles] = useState<ProfileInterface[]>([]);
+  const profileContext = useContext(ProfileContext);
+  profileContext.profiles = profiles;
 
   useEffect(() => {
     let url =
